@@ -48,6 +48,6 @@ app.MapRazorComponents<App>()
 // to users or could be a source of prompt injection risk.
 await DataIngestor.IngestDataAsync(
     app.Services,
-    new PDFDirectorySource(Path.Combine(builder.Environment.WebRootPath, "Data")));
+    new WebIngestionSource("https://dotnetcore.show"));
 
 app.Run();

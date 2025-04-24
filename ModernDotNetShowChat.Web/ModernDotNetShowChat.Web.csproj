@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="1.3.0" />
     <PackageReference Include="Aspire.Azure.AI.OpenAI" Version="9.1.0-preview.1.25121.10" />
     <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.4.0-preview.1.25207.5" />
     <PackageReference Include="CommunityToolkit.Aspire.Microsoft.EntityFrameworkCore.Sqlite" Version="9.3.1-beta.260" />
@@ -15,6 +16,7 @@
     <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.45.0" />
     <PackageReference Include="PdfPig" Version="0.1.9" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+    <PackageReference Include="Textify" Version="0.2.0-beta" />
   </ItemGroup>
 
   <ItemGroup>

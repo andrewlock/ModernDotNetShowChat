@@ -36,28 +36,35 @@ public class DataIngestor(
         await ingestionCacheDb.SaveChangesAsync();
 
         var modifiedDocs = await source.GetNewOrModifiedDocumentsAsync(documentsForSource);
-        foreach (var modifiedDoc in modifiedDocs)
+        foreach (var chunk in modifiedDocs.Chunk(20))
         {
-            logger.LogInformation("Processing {file}", modifiedDoc.Id);
-
-            if (modifiedDoc.Records.Count > 0)
+            foreach (var modifiedDoc in chunk)
             {
-                await vectorCollection.DeleteBatchAsync(modifiedDoc.Records.Select(r => r.Id));
+                logger.LogInformation("Processing {file}", modifiedDoc.Id);
+
+                if (modifiedDoc.Records.Count > 0)
+                {
+                    await vectorCollection.DeleteBatchAsync(modifiedDoc.Records.Select(r => r.Id));
+                }
+
+                var newRecords = await source.CreateRecordsForDocumentAsync(embeddingGenerator, modifiedDoc.Id);
+                await foreach (var id in vectorCollection.UpsertBatchAsync(newRecords))
+                {
+                }
+
+                modifiedDoc.Records.Clear();
+                modifiedDoc.Records.AddRange(newRecords.Select(r => new IngestedRecord
+                    { Id = r.Key, DocumentId = modifiedDoc.Id }));
+
+                if (ingestionCacheDb.Entry(modifiedDoc).State == EntityState.Detached)
+                {
+                    ingestionCacheDb.Documents.Add(modifiedDoc);
+                }
             }
 
-            var newRecords = await source.CreateRecordsForDocumentAsync(embeddingGenerator, modifiedDoc.Id);
-            await foreach (var id in vectorCollection.UpsertBatchAsync(newRecords)) { }
-
-            modifiedDoc.Records.Clear();
-            modifiedDoc.Records.AddRange(newRecords.Select(r => new IngestedRecord { Id = r.Key, DocumentId = modifiedDoc.Id }));
-
-            if (ingestionCacheDb.Entry(modifiedDoc).State == EntityState.Detached)
-            {
-                ingestionCacheDb.Documents.Add(modifiedDoc);
-            }
+            await ingestionCacheDb.SaveChangesAsync();
         }
 
-        await ingestionCacheDb.SaveChangesAsync();
         logger.LogInformation("Ingestion is up-to-date");
     }
 }

@@ -15,7 +15,7 @@ public class SemanticSearch(
         var nearest = await vectorCollection.VectorizedSearchAsync(queryEmbedding, new VectorSearchOptions<SemanticSearchRecord>
         {
             Top = maxResults,
-            Filter = filenameFilter is { Length: > 0 } ? record => record.FileName == filenameFilter : null,
+            Filter = filenameFilter is { Length: > 0 } ? record => record.Url == filenameFilter : null,
         });
         var results = new List<SemanticSearchRecord>();
         await foreach (var item in nearest.Results)

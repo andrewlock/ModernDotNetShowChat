@@ -8,10 +8,7 @@ public class SemanticSearchRecord
     public required string Key { get; set; }
 
     [VectorStoreRecordData(IsFilterable = true)]
-    public required string FileName { get; set; }
-
-    [VectorStoreRecordData]
-    public int PageNumber { get; set; }
+    public required string Url { get; set; }
 
     [VectorStoreRecordData]
     public required string Text { get; set; }
